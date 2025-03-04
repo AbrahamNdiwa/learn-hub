@@ -28,7 +28,7 @@ $result = mysqli_query($conn, $query);
 <body>
     <div class="container mt-4">
         <h2>My Notes</h2>
-        <button class="btn btn-primary mb-3" id="addNoteBtn" data-page="add_note">Add New Note</button>
+        <button class="btn btn-primary mb-3 mt-2" id="addNoteBtn" data-page="add_note">Add New Note</button>
 
         <div id="notes-list">
             <?php while ($row = mysqli_fetch_assoc($result)): ?>

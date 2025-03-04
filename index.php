@@ -64,6 +64,7 @@ $popularNotes = mysqli_query($conn, $popularNotesQuery);
                     <div class="card p-3">
                         <h5><a href="note.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a></h5>
                         <p><?php echo htmlspecialchars(substr($note['content'], 0, 100)); ?>...</p>
+                        <p><small>Views: <?= $note['views'] ?> | Likes: <?= $note['likes'] ?> | Bookmarks: <?= $note['bookmarks'] ?></small></p>
                     </div>
                 </div>
             <?php endwhile; ?>
@@ -75,6 +76,7 @@ $popularNotes = mysqli_query($conn, $popularNotesQuery);
                     <div class="card p-3">
                         <h5><a href="note.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a></h5>
                         <p><?php echo htmlspecialchars(substr($note['content'], 0, 100)); ?>...</p>
+                        <p><small>Views: <?= $note['views'] ?> | Likes: <?= $note['likes'] ?> | Bookmarks: <?= $note['bookmarks'] ?></small></p>
                     </div>
                 </div>
             <?php endwhile; ?>

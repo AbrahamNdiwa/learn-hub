@@ -1,12 +1,39 @@
 <?php
 include 'db.php';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
     $fullname = clean_input($_POST['fullname']);
     $email = clean_input($_POST['email']);
     $password = password_hash(clean_input($_POST['password']), PASSWORD_BCRYPT);
-    
-    $sql = "INSERT INTO users (fullname, email, password) VALUES ('$fullname', '$email', '$password')";
-    $conn->query($sql);
-    header("Location: auth.php");
+
+    // Check if email already exists
+    $check_query = "SELECT id FROM users WHERE email = ?";
+    $stmt = $conn->prepare($check_query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        echo "<script>
+                alert('Email already registered. Please use another email.');
+                window.location.href = 'auth.php';
+              </script>";
+        exit();
+    }
+
+    // Insert user if email is not taken
+    $sql = "INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $fullname, $email, $password);
+
+    if ($stmt->execute()) {
+        echo "<script>
+                alert('Successfully registered! Click OK to proceed to login.');
+                window.location.href = 'auth.php';
+              </script>";
+        exit();
+    } else {
+        echo "Error: " . $stmt->error;
+    }
 }
 ?>

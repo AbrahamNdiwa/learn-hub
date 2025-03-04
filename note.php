@@ -2,96 +2,85 @@
 include 'db.php';
 session_start();
 
-// Fetch recent notes
-$recentNotesQuery = "SELECT * FROM notes ORDER BY created_at DESC LIMIT 6";
-$recentNotes = mysqli_query($conn, $recentNotesQuery);
+$note_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-// Fetch popular notes based on bookmarks/likes
-$popularNotesQuery = "SELECT * FROM notes ORDER BY bookmarks DESC, likes DESC LIMIT 6";
-$popularNotes = mysqli_query($conn, $popularNotesQuery);
+$note_query = "SELECT * FROM notes WHERE id = $note_id";
+$result = mysqli_query($conn, $note_query);
+$note = mysqli_fetch_assoc($result);
+
+if (!$note) {
+    echo "<p>Note not found.</p>";
+    exit();
+}
+
+// Update views count
+mysqli_query($conn, "UPDATE notes SET views = views + 1 WHERE id = $note_id");
+
+// Check if user has already liked the note
+$liked = false;
+if ($user_id) {
+    $like_check = mysqli_query($conn, "SELECT * FROM likes WHERE user_id = $user_id AND note_id = $note_id");
+    $liked = mysqli_num_rows($like_check) > 0;
+}
+
+// Check if user has already bookmarked the note
+$bookmarked = false;
+if ($user_id) {
+    $bookmark_check = mysqli_query($conn, "SELECT * FROM bookmarks WHERE user_id = $user_id AND note_id = $note_id");
+    $bookmarked = mysqli_num_rows($bookmark_check) > 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnHub - Home</title>
+    <title><?php echo htmlspecialchars($note['title']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light px-3 mx-10">
         <div class="container">
-            <a class="navbar-brand" href="#">LearnHub</a>
-            <div class="d-flex">
-                <?php if(isset($_SESSION['user_fullname'])): ?>
-                    <?php $initials = strtoupper(substr($_SESSION['user_fullname'], 0, 1)); ?>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?php echo $initials; ?>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                        </ul>
-                    </div>
+            <a class="navbar-brand" href="index.php">LearnHub</a>
+            <div class="ms-auto">
+                <?php if ($user_id): ?>
+                    <a href="dashboard.php" class="btn btn-primary">Dashboard</a>
                 <?php else: ?>
-                    <a href="auth.php" class="btn btn-primary">Login / Register</a>
+                    <a href="auth.php" class="btn btn-outline-primary">Login</a>
+                    <a href="auth.php" class="btn btn-primary">Register</a>
                 <?php endif; ?>
             </div>
         </div>
     </nav>
     <div class="container mt-4">
-        <div class="text-center">
-            <input type="text" id="search" class="form-control rounded-pill w-50 mx-auto" placeholder="Search notes...">
+        <h2><?php echo htmlspecialchars($note['title']); ?></h2>
+        <p><small>Views: <?= $note['views'] ?> | Likes: <?= $note['likes'] ?> | Bookmarks: <?= $note['bookmarks'] ?></small></p>
+        <div class="mb-4">
+            <p><?php echo nl2br(htmlspecialchars($note['content'])); ?></p>
         </div>
-        <div id="searchResults" class="mt-3"></div>
-        <div class="mt-3 d-flex justify-content-center gap-2">
-            <span class="badge bg-secondary p-2">Math</span>
-            <span class="badge bg-secondary p-2">Physics</span>
-            <span class="badge bg-secondary p-2">Chemistry</span>
-            <span class="badge bg-secondary p-2">Biology</span>
-        </div>
-        <h4 class="mt-4">Recent Notes</h4>
-        <div class="row">
-            <?php while($note = mysqli_fetch_assoc($recentNotes)): ?>
-                <div class="col-md-4">
-                    <div class="card p-3">
-                        <h5><a href="note.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a></h5>
-                        <p><?php echo htmlspecialchars(substr($note['content'], 0, 100)); ?>...</p>
-                    </div>
-                </div>
-            <?php endwhile; ?>
-        </div>
-        <h4 class="mt-4">Popular Notes</h4>
-        <div class="row">
-            <?php while($note = mysqli_fetch_assoc($popularNotes)): ?>
-                <div class="col-md-4">
-                    <div class="card p-3">
-                        <h5><a href="note.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a></h5>
-                        <p><?php echo htmlspecialchars(substr($note['content'], 0, 100)); ?>...</p>
-                    </div>
-                </div>
-            <?php endwhile; ?>
-        </div>
+        <button class="btn btn-primary" id="like-btn" <?php echo $liked ? 'disabled' : ''; ?>><?php echo $liked ? 'Liked' : 'Like'; ?></button>
+        <?php if ($user_id): ?>
+            <button class="btn btn-warning" id="bookmark-btn"> <?php echo $bookmarked ? 'Remove Bookmark' : 'Bookmark'; ?> </button>
+        <?php else: ?>
+            <p>Login to bookmark this note.</p>
+        <?php endif; ?>
     </div>
+
     <script>
-        $(document).ready(function() {
-            $('#search').on('keyup', function() {
-                let query = $(this).val();
-                if (query.length > 2) {
-                    $.ajax({
-                        url: 'search.php',
-                        method: 'POST',
-                        data: {query: query},
-                        success: function(data) {
-                            $('#searchResults').html(data);
-                        }
-                    });
-                } else {
-                    $('#searchResults').html('');
-                }
-            });
+        $('#like-btn').click(function() {
+            $.post('like_note.php', { note_id: <?php echo $note_id; ?> }, function(response) {
+                $('#like-count').text(response.likes);
+                $('#like-btn').prop('disabled', true).text('Liked');
+            }, 'json');
+        });
+
+        $('#bookmark-btn').click(function() {
+            $.post('bookmark_note.php', { note_id: <?php echo $note_id; ?> }, function(response) {
+                $('#bookmark-count').text(response.bookmarks);
+                $('#bookmark-btn').text(response.bookmarked ? 'Remove Bookmark' : 'Bookmark');
+            }, 'json');
         });
     </script>
 </body>
