@@ -2,10 +2,12 @@
 include 'db.php';
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: auth.php");
     exit();
 }
 $fullname = $_SESSION['fullname'];
+
+$initials = initials($fullname);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,73 +17,51 @@ $fullname = $_SESSION['fullname'];
     <title>Dashboard - LearnHub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles/styles.css"/>
 </head>
 <body>
+    <nav class="navbar navbar-light bg-light px-3">
+        <button class="toggle-btn" id="sidebarToggle">☰</button>
+        <a href="index.php" class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover">
+            <h4 class="navbar-brand mx-5">LearnHub</h4>
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <?php echo $initials; ?>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="d-flex">
-        <nav class="bg-light vh-100 p-3" style="width: 250px;">
-            <h4>LearnHub</h4>
+        <nav class="sidebar bg-light vh-100 p-3" id="sidebar">
             <ul class="nav flex-column">
-                <li class="nav-item"><a href="#" class="nav-link menu-item" data-target="dashboard-content">Dashboard</a></li>
-                <li class="nav-item"><a href="#" class="nav-link menu-item" data-target="my-notes-content">My Notes</a></li>
-                <li class="nav-item"><a href="#" class="nav-link menu-item" data-target="bookmarks-content">Bookmarks</a></li>
-                <li class="nav-item"><a href="#" class="nav-link menu-item" data-target="settings-content">Settings</a></li>
-                <li class="nav-item"><a href="logout.php" class="nav-link text-danger">Logout</a></li>
+                <li class="nav-item"><a href="#" class="nav-link load-page" data-page="dashboard_main.php">Dashboard</a></li>
+                <li class="nav-item"><a href="#" class="nav-link load-page" data-page="mynotes.php">My Notes</a></li>
+                <li class="nav-item"><a href="#" class="nav-link load-page" data-page="bookmarks.php">Bookmarks</a></li>
+                <li class="nav-item"><a href="#" class="nav-link load-page" data-page="settings.php">Settings</a></li>
             </ul>
         </nav>
-        <div class="container p-4">
-            <div id="dashboard-content">
-                <h2>Welcome, <?php echo $fullname; ?>!</h2>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <h5>Total Notes</h5>
-                            <p>10</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <h5>Bookmarks</h5>
-                            <p>5</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-3">
-                            <h5>Total Views</h5>
-                            <p>200</p>
-                        </div>
-                    </div>
-                </div>
-                <h4 class="mt-4">Recent Activity</h4>
-                <ul>
-                    <li>Added new note: "Chemistry Final Review" - 2 hours ago</li>
-                    <li>Updated note: "Physics Equations" - 1 day ago</li>
-                    <li>Bookmarked: "Math Formulas" - 3 days ago</li>
-                </ul>
-                <a href="#" class="btn btn-primary">Create New Note</a>
-                <a href="#" class="btn btn-secondary">Browse Notes</a>
-            </div>
-            <div id="my-notes-content" style="display: none;">
-                <h2>My Notes</h2>
-                <p>Here you can manage your notes.</p>
-            </div>
-            <div id="bookmarks-content" style="display: none;">
-                <h2>Bookmarks</h2>
-                <p>Here are your bookmarked notes.</p>
-            </div>
-            <div id="settings-content" style="display: none;">
-                <h2>Settings</h2>
-                <p>Manage your account settings here.</p>
-            </div>
+
+        <div class="container p-4" id="main-content">
         </div>
     </div>
 
     <script>
         $(document).ready(function() {
-            $('.menu-item').click(function(e) {
+            $('#main-content').load('dashboard_main.php');
+
+            $('.load-page').click(function(e) {
                 e.preventDefault();
-                var target = $(this).data('target');
-                $('div[id$="-content"]').hide();
-                $('#' + target).show();
+                var page = $(this).data('page');
+                $('#main-content').load(page);
+            });
+
+            $('#sidebarToggle').click(function() {
+                $('#sidebar').toggleClass('hidden');
             });
         });
     </script>

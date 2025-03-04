@@ -7,6 +7,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
     
     $sql = "INSERT INTO users (fullname, email, password) VALUES ('$fullname', '$email', '$password')";
     $conn->query($sql);
-    header("Location: login.php");
+    header("Location: auth.php");
 }
 ?>

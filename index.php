@@ -18,20 +18,25 @@ $popularNotes = mysqli_query($conn, $popularNotesQuery);
     <title>LearnHub - Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="#">LearnHub</a>
             <div class="d-flex">
-                <?php if(isset($_SESSION['user_fullname'])): ?>
-                    <?php $initials = strtoupper(substr($_SESSION['user_fullname'], 0, 1)); ?>
+                <?php if(isset($_SESSION['fullname'])): ?>
+                    <?php $initials = initials($_SESSION['fullname']); ?>
+                    <div class="d-flex gap-3 align-items-center">
+                    <div>
+                        <a class="dropdown-item" href="dashboard.php">Dashboard</a>
+                    </div>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             <?php echo $initials; ?>
                         </button>
-                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <!-- <li><a class="dropdown-item" href="dashboard.php">Dashboard</a></li> -->
                             <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                         </ul>
                     </div>
