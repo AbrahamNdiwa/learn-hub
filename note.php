@@ -39,11 +39,14 @@ if ($user_id) {
     <title><?php echo htmlspecialchars($note['title']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" type="image/png" href="./images/favicon.ico">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-3 mx-10">
         <div class="container">
-            <a class="navbar-brand" href="index.php">LearnHub</a>
+            <a class="navbar-brand" href="index.php">
+                <img src="./images/logo.png" width="100px" height="50px" class="img-fluid rounded float-start" />
+            </a>
             <div class="ms-auto">
                 <?php if ($user_id): ?>
                     <a href="dashboard.php" class="btn btn-primary">Dashboard</a>

@@ -23,7 +23,9 @@ $result = mysqli_query($conn, $query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Notes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles/styles.css"/>
 </head>
 <body>
     <div class="container mt-4">
@@ -37,7 +39,7 @@ $result = mysqli_query($conn, $query);
                         <h5 class="card-title"><?= htmlspecialchars($row['title']) ?></h5>
                         <p class="card-text"><?= nl2br(htmlspecialchars($row['content'])) ?></p>
                         <p><small>Views: <?= $row['views'] ?> | Likes: <?= $row['likes'] ?> | Bookmarks: <?= $row['bookmarks'] ?></small></p>
-                        <button class="btn btn-warning edit-note" data-id="<?= $row['id'] ?>">Edit</button>
+                        <button class="btn btn-warning edit-note" data-id="<?= $row['id'] ?>" data-bs-toggle="modal" data-bs-target="#editNoteModal">Edit</button>
                         <button class="btn btn-danger delete-note" data-id="<?= $row['id'] ?>">Delete</button>
                     </div>
                 </div>
@@ -47,7 +49,7 @@ $result = mysqli_query($conn, $query);
 
     <!-- Edit Note Modal -->
     <div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg custom-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editNoteModalLabel">Edit Note</h5>
@@ -57,12 +59,12 @@ $result = mysqli_query($conn, $query);
                     <form id="editNoteForm">
                         <input type="hidden" id="editNoteId">
                         <div class="mb-3">
-                            <label for="editNoteTitle" class="form-label">Title</label>
+                            <label for="editNoteTitle" class="form-label"><b>Title</b></label>
                             <input type="text" class="form-control" id="editNoteTitle" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editNoteContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="editNoteContent" rows="4" required></textarea>
+                            <label for="editNoteContent" class="form-label font-weight-bold"><b>Content</b></label>
+                            <textarea class="form-control" id="editNoteContent" rows="7" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>

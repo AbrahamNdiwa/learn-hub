@@ -3,11 +3,11 @@ include 'db.php';
 session_start();
 
 // Fetch recent notes
-$recentNotesQuery = "SELECT * FROM notes ORDER BY created_at DESC LIMIT 6";
+$recentNotesQuery = "SELECT * FROM notes ORDER BY created_at DESC LIMIT 3";
 $recentNotes = mysqli_query($conn, $recentNotesQuery);
 
 // Fetch popular notes based on bookmarks/likes
-$popularNotesQuery = "SELECT * FROM notes ORDER BY bookmarks DESC, likes DESC LIMIT 6";
+$popularNotesQuery = "SELECT * FROM notes ORDER BY bookmarks DESC, likes DESC LIMIT 3";
 $popularNotes = mysqli_query($conn, $popularNotesQuery);
 ?>
 <!DOCTYPE html>
@@ -19,11 +19,14 @@ $popularNotes = mysqli_query($conn, $popularNotesQuery);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="icon" type="image/png" href="./images/favicon.ico">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="#">LearnHub</a>
+            <a class="navbar-brand" href="#">
+                <img src="./images/logo.png" width="100px" height="50px" class="img-fluid rounded float-start" />
+            </a>
             <div class="d-flex">
                 <?php if(isset($_SESSION['fullname'])): ?>
                     <?php $initials = initials($_SESSION['fullname']); ?>
@@ -63,7 +66,7 @@ $popularNotes = mysqli_query($conn, $popularNotesQuery);
                 <div class="col-md-4">
                     <div class="card p-3">
                         <h5><a href="note.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a></h5>
-                        <p><?php echo htmlspecialchars(substr($note['content'], 0, 100)); ?>...</p>
+                        <p><?php echo htmlspecialchars(substr($note['content'], 0, 75)); ?>...</p>
                         <p><small>Views: <?= $note['views'] ?> | Likes: <?= $note['likes'] ?> | Bookmarks: <?= $note['bookmarks'] ?></small></p>
                     </div>
                 </div>
@@ -75,7 +78,7 @@ $popularNotes = mysqli_query($conn, $popularNotesQuery);
                 <div class="col-md-4">
                     <div class="card p-3">
                         <h5><a href="note.php?id=<?php echo $note['id']; ?>"><?php echo htmlspecialchars($note['title']); ?></a></h5>
-                        <p><?php echo htmlspecialchars(substr($note['content'], 0, 100)); ?>...</p>
+                        <p><?php echo htmlspecialchars(substr($note['content'], 0, 75)); ?>...</p>
                         <p><small>Views: <?= $note['views'] ?> | Likes: <?= $note['likes'] ?> | Bookmarks: <?= $note['bookmarks'] ?></small></p>
                     </div>
                 </div>
